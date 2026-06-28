@@ -42,3 +42,9 @@ const Port_PinConfigType PortCfg_Pins[] = {
 
 /* Tổng số chân cấu hình */
 const uint32 PortCfg_PinsCount = sizeof(PortCfg_Pins) / sizeof(Port_PinConfigType);
+
+/* Cấu hình tổng Port driver */
+const Port_ConfigType PortCfg_Config = {
+    .PinConfigs = PortCfg_Pins,
+    .PinCount   = PortCfg_PinsCount,
+};

@@ -47,6 +47,8 @@
 #define PORT_PIN_MODE_SPI 3
 #define PORT_PIN_MODE_CAN 4
 #define PORT_PIN_MODE_LIN 5
+#define PORT_PIN_MODE_AF_PP 6
+#define PORT_PIN_MODE_AF_OD 7
 
 #define PORT_PIN_PULL_NONE 0
 #define PORT_PIN_PULL_UP 1

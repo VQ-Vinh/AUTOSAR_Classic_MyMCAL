@@ -80,14 +80,23 @@ static void Port_ApplyPinConfig(const Port_PinConfigType *pinCfg)
     {
         if(pinCfg->Direction == PORT_PIN_OUT)
         {
-            return
+            return;
         }
         else
         {
-            GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AIN; // Chế độ analog cho ADC
+            GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AIN;
         }
     }
-    /* Các mode khác như ADC, PWM, SPI ... mở rộng thêm tùy MCU */
+
+    if (pinCfg->Mode == PORT_PIN_MODE_AF_PP)
+    {
+        GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;
+    }
+
+    if (pinCfg->Mode == PORT_PIN_MODE_AF_OD)
+    {
+        GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_OD;
+    }
 
     /* Khởi tạo chân */
     GPIO_Init(PORT_GET_PORT(pinCfg->PortNum), &GPIO_InitStruct);
