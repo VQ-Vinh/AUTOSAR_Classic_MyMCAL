@@ -14,16 +14,18 @@
  * Cấu hình chi tiết cho các chân sử dụng trong hệ thống
  * - PA0:  PWM output (TIM2_CH1) - Alternate Function Push-Pull
  * - PA7:  PWM output (TIM3_CH2) - Alternate Function Push-Pull
+ * - PC13: DIO output (LED onboard)
  **********************************************************/
 const Port_PinConfigType PortCfg_Pins[] = {
     /* PA0 - TIM2_CH1 - PWM Output */
     {
         .PortNum              = PORT_ID_A,
         .PinNum               = 0,
-        .Mode                 = PORT_PIN_MODE_AF_PP,    // Alternate Function Push-Pull
+        .Mode                 = PORT_PIN_MODE_AF_PP,
         .Direction            = PORT_PIN_OUT,
+        .Speed                = GPIO_Speed_50MHz,
         .DirectionChangeable  = 0,
-        .Level                = PORT_PIN_LEVEL_LOW,      // Không quan trọng với AF_PP
+        .Level                = PORT_PIN_LEVEL_LOW,
         .Pull                 = PORT_PIN_PULL_NONE,
         .ModeChangeable       = 0
     },
@@ -31,10 +33,23 @@ const Port_PinConfigType PortCfg_Pins[] = {
     {
         .PortNum              = PORT_ID_A,
         .PinNum               = 7,
-        .Mode                 = PORT_PIN_MODE_AF_PP,    // Alternate Function Push-Pull
+        .Mode                 = PORT_PIN_MODE_AF_PP,
         .Direction            = PORT_PIN_OUT,
+        .Speed                = GPIO_Speed_50MHz,
         .DirectionChangeable  = 0,
         .Level                = PORT_PIN_LEVEL_LOW,
+        .Pull                 = PORT_PIN_PULL_NONE,
+        .ModeChangeable       = 0
+    },
+    /* PC13 - LED onboard */
+    {
+        .PortNum              = PORT_ID_C,
+        .PinNum               = 13,
+        .Mode                 = PORT_PIN_MODE_DIO,
+        .Direction            = PORT_PIN_OUT,
+        .Speed                = GPIO_Speed_2MHz,
+        .DirectionChangeable  = 1,
+        .Level                = PORT_PIN_LEVEL_HIGH,
         .Pull                 = PORT_PIN_PULL_NONE,
         .ModeChangeable       = 0
     }

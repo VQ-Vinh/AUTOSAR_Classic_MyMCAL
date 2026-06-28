@@ -1,127 +1,129 @@
-# AUTOSAR Classic MCAL — STM32F103
+# Mini-Project: Hệ Thống Điều Khiển Quạt Làm Mát Theo Nhiệt Độ
 
-Dự án **Microcontroller Abstraction Layer (MCAL)** theo chuẩn **AUTOSAR Classic** dành cho vi điều khiển **STM32F103 (Cortex-M3)**, sử dụng **Standard Peripheral Library (SPL)** của STMicroelectronics.
+## Mô tả
+
+Hệ thống sử dụng **STM32F103C8T6** và các driver **AUTOSAR MCAL** để điều khiển quạt DC 12V dựa trên nhiệt độ môi trường đọc từ cảm biến analog (LM35/NTC).
+
+| Điều kiện | Hành động |
+|-----------|-----------|
+| Nhiệt độ < 30°C | Quạt tắt, LED tắt |
+| 30°C ≤ Nhiệt độ < 40°C | Quạt 50% duty, LED bật |
+| Nhiệt độ ≥ 40°C | Quạt 100% duty, LED bật |
 
 ## Kiến trúc phần mềm
 
 ```
-Application Layer (main.c)
-       |
-IoHwAb Layer (ECU Abstraction)  ← chưa triển khai
-       |
-   MCAL Layer
-  ┌─────┬─────┬──────┬──────┐
-  │ Adc │ Dio │ Port │ Pwm │
-  └──┬──┴──┬──┴──┬───┴──┬───┘
-     │     │     │      │
-     └── SPL (Standard Peripheral Library) ──┘
-                    │
-               CMSIS + Startup
+Application (main.c)
+      |
+  IoHwAb Layer          ← ECU Abstraction, API duy nhất cho ứng dụng
+      |
+  MCAL Layer
+  ┌──────┬──────┬──────┬──────┐
+  │ Adc  │ Dio  │ Port │ Pwm  │
+  └──┬───┴──┬───┴──┬───┴──┬───┘
+     │      │      │      │
+     └─── SPL (Standard Peripheral Library) ───┘
+                      |
+                 CMSIS + Startup
 ```
+
+## Yêu cầu phần cứng
+
+| Linh kiện | Chức năng | Kết nối STM32 |
+|-----------|-----------|---------------|
+| STM32F103C8T6 | Vi điều khiển | — |
+| LM35 hoặc NTC | Cảm biến nhiệt | PA0 (ADC1_IN0) |
+| IRLZ44N MOSFET | Điều khiển quạt PWM | PA8 (TIM1_CH1) |
+| Quạt DC 12V | Làm mát | MOSFET drain |
+| LED + 220Ω | Báo trạng thái quạt | PC13 (active LOW) |
 
 ## Cấu trúc thư mục
 
 ```
 My_MCAL/
-├── main.c                  # Entry point (rỗng)
-├── CMakeLists.txt          # Build gốc (rỗng)
+├── main.c                  # Ứng dụng: gọi IoHwAb API
+├── Makefile                # Targets: all, f1, flash, clean
+├── arm-none-eabi-gcc.cmake # Toolchain file
 ├── README.md
 │
-├── Config/                 # Cấu hình post-build / link-time
-│   ├── Adc_Cfg.c           #   2 groups: SW one-shot + HW streaming DMA
-│   ├── Dio_Cfg.c           #   (rỗng)
-│   ├── Port_cfg.c          #   PA0 (TIM2_CH1), PA7 (TIM3_CH2)
-│   └── Pwm_Lcfg.c          #   TIM2_CH1 + TIM3_CH2
+├── IoHwAb/                 # ECU Abstraction Layer
+│   ├── IoHwAb.h
+│   ├── IoHwAb.c
+│   ├── IoHwAb_Cfg.h
+│   └── IoHwAb_Cfg.c
 │
 ├── MCAL/                   # MCAL Drivers
-│   ├── Adc/                #   ADC driver (~1417 dòng)
-│   ├── Dio/                #   DIO driver (~259 dòng)
-│   ├── Port/               #   Port driver (~196 dòng)
-│   └── Pwm/                #   PWM driver (~465 dòng)
+│   ├── Adc/                #   ADC driver
+│   ├── Dio/                #   DIO driver
+│   ├── Port/               #   Port driver
+│   └── Pwm/                #   PWM driver
 │
-├── platform/               # Platform layer (build static lib)
-│   ├── CMakeLists.txt      #   Build platform library
-│   ├── include/Std_Types.h #   Kiểu AUTOSAR chuẩn
-│   ├── bsp/
-│   │   ├── cmsis/          #   CMSIS (core_cm3.h)
-│   │   ├── linker/         #   Linker script (stm32f103.ld)
-│   │   └── startup_stm32f10x_md.s
-│   ├── debug/              #   Semihost, SVD, syscalls
-│   └── spl/                #   STM32 SPL (24 .c + 26 .h)
+├── Config/                 # Cấu hình MCAL
+│   ├── Adc_Cfg.c / .h
+│   ├── Dio_Cfg.c
+│   ├── Port_cfg.c / .h
+│   └── Pwm_Lcfg.c
+│   └── Pwm_Cfg.h
 │
-├── docs/                   # Tài liệu hướng dẫn
-│   ├── [Tài liệu] Hướng dẫn sử dụng API module ADC (MCAL).md
-│   ├── [Tài liệu] Hướng dẫn sử dụng API module DIO (MCAL).md
-│   ├── [Tài liệu] Hướng dẫn sử dụng API module PORT (MCAL).md
-│   ├── [Tài liệu] Hướng dẫn sử dụng API module PWM (MCAL).md
-│   ├── [Mini-Project 1] Hệ thống điều khiển quạt làm mát động cơ.md
-│   └── I_O Hardware Abstraction - IoHwAb) trong AUTOSAR.md
-│
-└── images/
+└── platform/               # Platform (SPL + CMSIS + startup)
+    ├── CMakeLists.txt
+    ├── include/
+    ├── bsp/                #   CMSIS, linker script, startup
+    ├── spl/                #   STM32 SPL
+    └── debug/              #   (local, không track git)
 ```
 
-## MCAL Drivers
-
-### ADC Driver (`MCAL/Adc/`)
-- API: Init, DeInit, Start/StopGroupConversion, ReadGroup, SetupResultBuffer, Enable/DisableHardwareTrigger, Enable/DisableGroupNotification, GetGroupStatus, GetStreamLastPointer, GetVersionInfo, Power State APIs
-- Hỗ trợ Single / Streaming mode, DMA (circular / linear), SW / HW trigger
-- ISR handler cho EOC và DMA HT/TC
-- Config: Group 0 (SW trigger, one-shot, single access), Group 1 (HW trigger, continuous, streaming + DMA circular)
-
-### DIO Driver (`MCAL/Dio/`)
-- API: ReadChannel, WriteChannel, ReadPort, WritePort, ReadChannelGroup, WriteChannelGroup, FlipChannel, GetVersionInfo
-- Macro mapping `DIO_CHANNEL(Port, Pin)` cho GPIOA-D (0-63)
-
-### Port Driver (`MCAL/Port/`)
-- API: Init, SetPinDirection, RefreshPortDirection, SetPinMode, GetVersionInfo
-- Cấu hình: mode (DIO/ADC/PWM/SPI/CAN/LIN), direction, speed, pull, level, changeable flags
-
-### PWM Driver (`MCAL/Pwm/`)
-- API: Init, DeInit, SetDutyCycle, SetPeriodAndDuty, SetOutputToIdle, GetOutputState, Enable/DisableNotification, GetVersionInfo, Power State APIs
-- Hỗ trợ TIM1-4, variable / fixed period, notification edge
-
-## Hardware Target
-
-| Thành phần | Mô tả |
-|-----------|-------|
-| MCU | STM32F103C8T6 (Cortex-M3, 72 MHz) |
-| Flash | 64 KB |
-| RAM | 20 KB |
-| SPL | STM32F10x Standard Peripheral Library |
-| CMSIS | core_cm3 |
-
-## Yêu cầu
-
-- **Toolchain**: ARM GCC (`arm-none-eabi-gcc`)
-- **Build**: CMake >= 3.10
-- **Debug**: OpenOCD + ST-Link (hoặc semihosting)
-
-## Build
+## Build & Flash
 
 ```bash
-mkdir build && cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/arm-none-eabi.cmake
-make
+make          # Build (auto-configure nếu chưa có build/)
+make f1       # Clean + build lại từ đầu
+make flash    # Build + nạp xuống STM32F1 qua ST-Link
+make clean    # Xoá thư mục build/
 ```
 
-> **Ghi chú**: `CMakeLists.txt` gốc ở thư mục đang rỗng — cần bổ sung cấu hình build.
+## Trạng thái hiện tại
 
-## Vấn đề cần xử lý
+| Module | Trạng thái | Ghi chú |
+|--------|-----------|---------|
+| Port Driver | ✅ Hoàn thành | PA0(ADC), PA8(PWM), PC13(LED) |
+| Dio Driver | ✅ Hoàn thành | Đọc/ghi từng chân, port, group |
+| Adc Driver | ✅ Hoàn thành | 2 groups: SW one-shot + HW streaming DMA |
+| Pwm Driver | ✅ Hoàn thành | TIM1_CH1(PA8), TIM3_CH2(PA7) |
+| IoHwAb | ✅ Hoàn thành | Init, Digital R/W, ADC, PWM, callbacks |
+| main.c | ✅ Blink PC13 | Đang test LED, chưa có logic quạt |
+| Platform | ✅ Hoàn thành | SPL, CMSIS, startup, linker script |
 
-| # | Vấn đề | File | Mức độ |
-|---|--------|------|--------|
-| 1 | Thiếu `Adc_Types.h` | `MCAL/Adc/Adc.h:17` | Cao |
-| 2 | Thiếu `Adc_Cfg.h` | `MCAL/Adc/Adc.c:13`, `Config/Adc_Cfg.c:11` | Cao |
-| 3 | Thiếu `Port_cfg.h` | `MCAL/Port/Port.c:17` | Cao |
-| 4 | Thiếu `Pwm_Cfg.h` | `MCAL/Pwm/Pwm.c:13` | Cao |
-| 5 | Thiếu define `PORT_PIN_MODE_AF_PP` | `Config/Port_cfg.c:23,33` | Cao |
-| 6 | Lỗi cú pháp thiếu `;` | `MCAL/Port/Port.c:83` | Cao |
-| 7 | `main.c` rỗng | `main.c` | Trung bình |
-| 8 | `CMakeLists.txt` rỗng | `CMakeLists.txt` | Trung bình |
+## Kế hoạch thực hiện
+
+### Bước 1: Cấu hình Port Driver
+- [x] PA0: Input analog (ADC1_IN0)
+- [ ] PA8: PWM output (TIM1_CH1) — cần thêm vào `Port_cfg.c` và cập nhật `Pwm_Lcfg.c`
+- [x] PC13: GPIO output (LED status, active LOW)
+
+### Bước 2: Cấu hình ADC
+- [x] ADC1, single channel, SW trigger, one-shot
+- [ ] Thêm group mới cho cảm biến nhiệt (hoặc dùng group 0 có sẵn)
+- [ ] Công thức scale: LM35 (10mV/°C, Vref=3.3V, 12-bit) → `temp = raw * 3300 / 4095 / 10`
+
+### Bước 3: Cấu hình PWM
+- [ ] Thêm kênh TIM1_CH1 (PA8) vào `Pwm_Lcfg.c`
+- [ ] Tần số 10 kHz, duty cycle điều chỉnh 0–100%
+
+### Bước 4: Cập nhật IoHwAb
+- [ ] Thêm API `IoHwAb_ReadTemperature(uint8 *temp)` — đọc ADC → scale → °C
+- [ ] Thêm API `IoHwAb_SetFanDuty(uint8 percent)` — gọi `Pwm_SetDutyCycle`
+- [ ] Cập nhật `IoHwAb_Cfg.h` nếu cần mapping mới
+
+### Bước 5: Viết ứng dụng (main.c)
+- [ ] Vòng lặp chính: đọc nhiệt độ → so sánh ngưỡng → điều khiển quạt + LED
+- [ ] Chỉ gọi API IoHwAb, không gọi trực tiếp MCAL
+
+### Bước 6: Kiểm thử
+- [ ] Build sạch, zero warning
+- [ ] Flash và kiểm tra trên board
+- [ ] Debug qua OpenOCD nếu cần
 
 ## Tài liệu tham khảo
 
-Xem thêm tại thư mục [`docs/`](docs/) bao gồm:
-- Hướng dẫn API từng module MCAL (ADC, DIO, Port, PWM)
-- Mini-project: Hệ thống điều khiển quạt làm mát động cơ
-- Lý thuyết về IoHwAb (I/O Hardware Abstraction) trong AUTOSAR
+- `docs/` — Hướng dẫn API từng module MCAL, lý thuyết IoHwAb, đề bài mini-project

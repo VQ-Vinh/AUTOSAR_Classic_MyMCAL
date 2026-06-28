@@ -39,7 +39,7 @@
    : ((ChannelId) < 32) ? GPIOB                                                \
    : ((ChannelId) < 48) ? GPIOC                                                \
    : ((ChannelId) < 64) ? GPIOD                                                \
-                        : NULL)
+                         : NULL_PTR)
 
 /**
  * @brief Macro xác định chân GPIO (bit mask) dựa trên ChannelId

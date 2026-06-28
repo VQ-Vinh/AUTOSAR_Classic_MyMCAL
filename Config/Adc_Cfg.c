@@ -8,7 +8,10 @@
  * @author  HALA Academy
  **********************************************************/
 
+#include "Adc.h"
 #include "Adc_Cfg.h"
+#include "stm32f10x_adc.h"
+#include "stm32f10x_dma.h"
 
 /**********************************************************
  * Callback mặc định (weak)

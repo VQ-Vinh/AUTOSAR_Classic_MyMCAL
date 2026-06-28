@@ -14,6 +14,7 @@
  */
 
 #include <stdint.h>
+#include <stddef.h>
 
 #ifndef FALSE
 #define FALSE (0u)
@@ -29,6 +30,18 @@
 
 #ifndef STD_OFF
 #define STD_OFF (0u)
+#endif
+
+#ifndef STD_HIGH
+#define STD_HIGH (0x01u)
+#endif
+
+#ifndef STD_LOW
+#define STD_LOW (0x00u)
+#endif
+
+#ifndef NULL_PTR
+#define NULL_PTR ((void *)0)
 #endif
 
 /* Kiểu trả về chuẩn */
@@ -53,5 +66,18 @@ typedef int64_t int64;
 
 typedef float float32;
 typedef double float64;
+
+/* Thông tin phiên bản */
+typedef struct
+{
+    uint16 vendorID;
+    uint16 moduleID;
+    uint8  sw_major_version;
+    uint8  sw_minor_version;
+    uint8  sw_patch_version;
+} Std_VersionInfoType;
+
+/* Development Error Tracer macro */
+#define Det_ReportError(ModuleId, InstanceId, ApiId, ErrorId)
 
 #endif /* STD_TYPES_H */

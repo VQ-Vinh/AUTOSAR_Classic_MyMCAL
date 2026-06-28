@@ -12,12 +12,10 @@ out/
 *.gch
 *.pch
 
-# Compiled dynamic libraries
+# Compiled libraries
 *.so
 *.dylib
 *.dll
-
-# Compiled static libraries
 *.a
 *.lib
 
@@ -29,22 +27,29 @@ out/
 *.out
 *.app
 
-# Map and listing files
+# Map, listing, debug info files
 *.map
 *.lst
 *.su
 *.srec
+*.repl
+*.svd
 
 # CMake generated
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
-Makefile
 compile_commands.json
 CTestTestfile.cmake
 *.cmake
-!platform/CMakeLists.txt
-!cmake/
+!/arm-none-eabi-gcc.cmake
+
+# Ignore generated Makefiles but keep root Makefile
+Makefile
+!/Makefile
+
+# Debug tooling (local dev only)
+platform/debug/
 
 # Documentation (local dev only)
 docs/

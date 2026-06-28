@@ -1,12 +1,4 @@
-/**********************************************************
- * @file    CMakeLists.txt
- * @brief   Top-level CMake build configuration
- * @details Build target for AUTOSAR MCAL on STM32F103 (SPL).
- * @version 1.0
- * @date    2024-09-30
- * @author  HALA Academy
- **********************************************************/
-
+# Top-level CMake build configuration for AUTOSAR MCAL on STM32F103 (SPL)
 cmake_minimum_required(VERSION 3.10)
 project(AUTOSAR_MCAL C ASM)
 
@@ -29,12 +21,15 @@ set(MCAL_INCLUDES
     MCAL/Dio
     MCAL/Port
     MCAL/Pwm
+    IoHwAb
     Config
 )
 
 # Application + Config
 set(APP_SOURCES
     main.c
+    IoHwAb/IoHwAb.c
+    IoHwAb/IoHwAb_Cfg.c
     Config/Adc_Cfg.c
     Config/Dio_Cfg.c
     Config/Port_cfg.c

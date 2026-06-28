@@ -12,6 +12,7 @@
 #define ADC_CFG_H
 
 #include "Std_Types.h"
+#include "Adc_Types.h"
 
 /**********************************************************
  * Compile-time switches (STD_ON / STD_OFF)

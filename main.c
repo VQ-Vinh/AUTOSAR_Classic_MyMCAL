@@ -1,17 +1,6 @@
-/**********************************************************
- * @file    main.c
- * @brief   Application entry point
- * @details Khởi tạo MCAL drivers và vòng lặp chính.
- *          Ví dụ: Port_Init -> Dio_WriteChannel.
- * @version 1.0
- * @date    2024-09-30
- * @author  HALA Academy
- **********************************************************/
-
 #include "Std_Types.h"
-#include "Port.h"
-#include "Port_cfg.h"
-#include "Dio.h"
+#include "IoHwAb.h"
+#include "IoHwAb_Cfg.h"
 
 static void delay(volatile uint32 count)
 {
@@ -23,13 +12,13 @@ static void delay(volatile uint32 count)
 
 int main(void)
 {
-    Port_Init(&PortCfg_Config);
+    IoHwAb_Init0(NULL_PTR);
 
     while (1)
     {
-        Dio_WriteChannel(DIO_CHANNEL_A0, STD_HIGH);
-        delay(500000U);
-        Dio_WriteChannel(DIO_CHANNEL_A0, STD_LOW);
-        delay(500000U);
+        IoHwAb_Digital_WriteSignal(IOHWAB_SIG_LED1, TRUE);
+        delay(3000000U);
+        IoHwAb_Digital_WriteSignal(IOHWAB_SIG_LED1, FALSE);
+        delay(3000000U);
     }
 }

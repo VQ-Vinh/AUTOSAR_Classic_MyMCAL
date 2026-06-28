@@ -12,6 +12,8 @@
 #include "Adc.h"
 #include "Adc_Cfg.h"
 #include "stm32f10x_rcc.h"
+#include "stm32f10x_adc.h"
+#include "stm32f10x_dma.h"
 #include "misc.h"
 #include <stddef.h>
 
