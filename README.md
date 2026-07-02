@@ -12,6 +12,10 @@ Demo project sử dụng AUTOSAR MCAL drivers để đọc **biến trở** qua 
 | PA1 | TIM2_CH2 | PWM → BJT/MOSFET → quạt |
 | PC13 | GPIO Out | LED onboard (active LOW) |
 
+## Schematic
+
+![Circuit](images/circuit_image.png)
+
 ## Logic
 
 ```c
