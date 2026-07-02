@@ -160,17 +160,47 @@ void Pwm_Init(const Pwm_ConfigType *ConfigPtr)
     {
         const Pwm_ChannelConfigType *channelConfig = &ConfigPtr->Channels[i];
 
-        /* Cấu hình chu kỳ cho timer (ARR) */
+        if (channelConfig->TIMx == TIM1)
+            RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+        else if (channelConfig->TIMx == TIM2)
+            RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+        else if (channelConfig->TIMx == TIM3)
+            RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+        else if (channelConfig->TIMx == TIM4)
+            RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+
         channelConfig->TIMx->ARR = channelConfig->defaultPeriod;
 
-        /* Giá trị compare ban đầu theo duty cycle mặc định */
+        TIM_OCInitTypeDef ocInit;
+        TIM_OCStructInit(&ocInit);
+        ocInit.TIM_OCMode = TIM_OCMode_PWM1;
+        ocInit.TIM_OutputState = TIM_OutputState_Enable;
+        ocInit.TIM_Pulse = 0;
+        ocInit.TIM_OCPolarity = (channelConfig->polarity == PWM_HIGH) ? TIM_OCPolarity_High : TIM_OCPolarity_Low;
+
+        switch (channelConfig->channel)
+        {
+        case 1U:
+            TIM_OC1Init(channelConfig->TIMx, &ocInit);
+            break;
+        case 2U:
+            TIM_OC2Init(channelConfig->TIMx, &ocInit);
+            break;
+        case 3U:
+            TIM_OC3Init(channelConfig->TIMx, &ocInit);
+            break;
+        case 4U:
+            TIM_OC4Init(channelConfig->TIMx, &ocInit);
+            break;
+        default:
+            break;
+        }
+
         Pwm_WriteCompareValue(channelConfig,
                               Pwm_ComputeCompareValue(channelConfig->defaultPeriod, channelConfig->defaultDutyCycle));
 
-        /* Bật timer */
         TIM_Cmd(channelConfig->TIMx, ENABLE);
 
-        /* Nếu là TIM1 (advanced), enable main output */
         if (channelConfig->TIMx == TIM1)
         {
             TIM_CtrlPWMOutputs(TIM1, ENABLE);

@@ -16,9 +16,24 @@ int main(void)
 
     while (1)
     {
-        IoHwAb_Digital_WriteSignal(IOHWAB_SIG_LED1, TRUE);
-        delay(3000000U);
-        IoHwAb_Digital_WriteSignal(IOHWAB_SIG_LED1, FALSE);
-        delay(3000000U);
+        uint8 pct;
+        uint8 duty;
+
+        if (IoHwAb_ReadAdcPercent(&pct) == E_OK)
+        {
+            if (pct > 50U)
+            {
+                duty = pct;
+                IoHwAb_SetFanDuty(duty);
+                IoHwAb_Digital_WriteSignal(IOHWAB_SIG_LED1, TRUE);
+            }
+            else
+            {
+                IoHwAb_SetFanDuty(0U);
+                IoHwAb_Digital_WriteSignal(IOHWAB_SIG_LED1, FALSE);
+            }
+        }
+
+        delay(100000U);
     }
 }

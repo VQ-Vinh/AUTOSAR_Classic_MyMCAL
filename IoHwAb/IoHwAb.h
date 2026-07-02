@@ -37,10 +37,10 @@ void IoHwAb_SetPwmDuty(Pwm_ChannelType channel, uint16 duty);
 Pwm_PeriodType IoHwAb_Pwm_ConvertToPeriod(Pwm_ChannelType channel, IoHwAb_FrequencyType freq);
 
 /**********************************************************
-* Application-Specific (temperature + heater example)
+* Application-Specific (ADC + fan control)
 **********************************************************/
-uint16 IoHwAb_GetTemperature(IoHwAb_StatusType *status);
-Std_ReturnType IoHwAb_SetHeaterPower(uint8 percent);
+Std_ReturnType IoHwAb_ReadAdcPercent(uint8 *percent);
+Std_ReturnType IoHwAb_SetFanDuty(uint8 percent);
 
 /**********************************************************
 * Callbacks (called by MCAL drivers)
