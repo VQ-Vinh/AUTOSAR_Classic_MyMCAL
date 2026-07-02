@@ -51,6 +51,9 @@ Makefile
 # Debug tooling (local dev only)
 platform/debug/
 
+# AI agent instructions (local dev only)
+AGENTS.md
+
 # Documentation (local dev only)
 docs/
 
